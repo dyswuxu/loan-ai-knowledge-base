@@ -64,7 +64,8 @@ module.exports = async function handler(req, res) {
     console.error('❌ Analysis error:', error);
     res.status(500).json({
       success: false,
-      error: error.message || 'Analysis failed'
+      error: error.message || 'Analysis failed',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };

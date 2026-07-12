@@ -2,7 +2,7 @@
  * 产品列表 API
  */
 import { NextResponse } from 'next/server';
-const { getAllProducts, getProductsByBank, getProductsByType } = require('../../../../lib/rag');
+const { getAllProducts, getProductsByBank, getProductsByType } = require('../../../lib/rag');
 
 export async function GET(request) {
   try {

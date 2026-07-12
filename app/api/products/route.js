@@ -1,7 +1,7 @@
 /**
  * 产品列表 API
  */
-const { getAllProducts, getProductsByBank, getProductsByType } = require('../../../lib/rag');
+const { getAllProducts, getProductsByBank, getProductsByType } = require('../../../../lib/rag');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {

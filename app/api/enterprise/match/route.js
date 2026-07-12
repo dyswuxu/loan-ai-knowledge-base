@@ -1,8 +1,8 @@
 /**
  * 产品匹配 API
  */
-const { matchProducts } = require('../../../lib/enterprise');
-const { searchProducts } = require('../../../lib/rag');
+const { matchProducts } = require('../../../../../lib/enterprise');
+const { searchProducts } = require('../../../../../lib/rag');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {

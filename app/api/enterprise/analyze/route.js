@@ -2,8 +2,8 @@
  * 企业综合分析 API
  * 一次性完成：分类 + 产品匹配 + 风控分析
  */
-const { classifyEnterprise, matchProducts, analyzeRisk } = require('../../../lib/enterprise');
-const { searchProducts } = require('../../../lib/rag');
+const { classifyEnterprise, matchProducts, analyzeRisk } = require('../../../../../lib/enterprise');
+const { searchProducts } = require('../../../../../lib/rag');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {

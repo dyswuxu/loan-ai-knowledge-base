@@ -1,7 +1,7 @@
 /**
  * 风控分析 API
  */
-const { analyzeRisk } = require('../../../lib/enterprise');
+const { analyzeRisk } = require('../../../../../lib/enterprise');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {

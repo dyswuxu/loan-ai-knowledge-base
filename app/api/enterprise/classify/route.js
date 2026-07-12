@@ -1,7 +1,7 @@
 /**
  * 企业画像分类 API
  */
-const { classifyEnterprise } = require('../../../lib/enterprise');
+const { classifyEnterprise } = require('../../../../../lib/enterprise');
 
 module.exports = async function handler(req, res) {
   // 只允许 POST 请求

@@ -1,0 +1,23 @@
+{
+  "name": "loan-ai-backend",
+  "version": "1.0.0",
+  "description": "贷款AI知识库系统",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "next": "^14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.5.2",
+    "postcss": "^8.5.17",
+    "tailwindcss": "^3.4.19"
+  }
+}

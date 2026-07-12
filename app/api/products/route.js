@@ -1,15 +1,14 @@
 /**
  * 产品列表 API
  */
-const { getAllProducts, getProductsByBank, getProductsByType } = require('../../../lib/rag');
+import { NextResponse } from 'next/server';
+const { getAllProducts, getProductsByBank, getProductsByType } = require('../../../../lib/rag');
 
-module.exports = async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+export async function GET(request) {
   try {
-    const { bank, type } = req.query;
+    const { searchParams } = new URL(request.url);
+    const bank = searchParams.get('bank');
+    const type = searchParams.get('type');
     
     let products;
     
@@ -21,16 +20,16 @@ module.exports = async function handler(req, res) {
       products = getAllProducts();
     }
 
-    res.status(200).json({
+    return NextResponse.json({
       success: true,
       total: products.length,
       data: products
     });
   } catch (error) {
     console.error('❌ Products error:', error);
-    res.status(500).json({
+    return NextResponse.json({
       success: false,
       error: error.message || 'Failed to get products'
-    });
+    }, { status: 500 });
   }
-};
+}

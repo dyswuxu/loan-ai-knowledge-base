@@ -1,19 +1,15 @@
 /**
  * 企业画像分类 API
  */
+import { NextResponse } from 'next/server';
 const { classifyEnterprise } = require('../../../../lib/enterprise');
 
-module.exports = async function handler(req, res) {
-  // 只允许 POST 请求
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+export async function POST(request) {
   try {
-    const { enterprise } = req.body;
+    const { enterprise } = await request.json();
     
     if (!enterprise) {
-      return res.status(400).json({ error: 'Enterprise data is required' });
+      return NextResponse.json({ error: 'Enterprise data is required' }, { status: 400 });
     }
 
     console.log('🔍 Classifying enterprise:', enterprise);
@@ -22,15 +18,15 @@ module.exports = async function handler(req, res) {
     
     console.log('✅ Classification result:', classification);
     
-    res.status(200).json({
+    return NextResponse.json({
       success: true,
       data: classification
     });
   } catch (error) {
     console.error('❌ Classification error:', error);
-    res.status(500).json({
+    return NextResponse.json({
       success: false,
       error: error.message || 'Classification failed'
-    });
+    }, { status: 500 });
   }
-};
+}

@@ -2,19 +2,16 @@
  * 企业综合分析 API
  * 一次性完成：分类 + 产品匹配 + 风控分析
  */
+import { NextResponse } from 'next/server';
 const { classifyEnterprise, matchProducts, analyzeRisk } = require('../../../../lib/enterprise');
 const { searchProducts } = require('../../../../lib/rag');
 
-module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+export async function POST(request) {
   try {
-    const { enterprise } = req.body;
+    const { enterprise } = await request.json();
     
     if (!enterprise) {
-      return res.status(400).json({ error: 'Enterprise data is required' });
+      return NextResponse.json({ error: 'Enterprise data is required' }, { status: 400 });
     }
 
     console.log('🚀 Starting comprehensive analysis for enterprise:', enterprise.name || 'Anonymous');
@@ -22,7 +19,7 @@ module.exports = async function handler(req, res) {
     // Step 1: 企业分类
     console.log('📊 Step 1: Classifying enterprise...');
     const classification = await classifyEnterprise(enterprise);
-    console.log('✅ Classification done:', classification);
+    console.log('✅ Classification done');
 
     // Step 2: 产品匹配
     console.log('📊 Step 2: Matching products...');
@@ -56,19 +53,18 @@ module.exports = async function handler(req, res) {
 
     console.log('🎉 Analysis complete!');
     
-    res.status(200).json({
+    return NextResponse.json({
       success: true,
       data: result
     });
   } catch (error) {
     console.error('❌ Analysis error:', error);
-    res.status(500).json({
+    return NextResponse.json({
       success: false,
-      error: error.message || 'Analysis failed',
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+      error: error.message || 'Analysis failed'
+    }, { status: 500 });
   }
-};
+}
 
 function buildSearchQuery(enterprise, classification) {
   const parts = [];

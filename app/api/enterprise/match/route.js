@@ -1,23 +1,19 @@
 /**
  * 产品匹配 API
  */
+import { NextResponse } from 'next/server';
 const { matchProducts } = require('../../../../lib/enterprise');
 const { searchProducts } = require('../../../../lib/rag');
 
-module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+export async function POST(request) {
   try {
-    const { enterprise, classification, query } = req.body;
+    const { enterprise, classification, query } = await request.json();
     
     if (!enterprise || !classification) {
-      return res.status(400).json({ error: 'Enterprise and classification data are required' });
+      return NextResponse.json({ error: 'Enterprise and classification data are required' }, { status: 400 });
     }
 
     console.log('🔍 Matching products for enterprise:', enterprise.name || 'Anonymous');
-    console.log('   Classification:', classification);
 
     // 构建查询文本
     const searchQuery = query || buildSearchQuery(enterprise, classification);
@@ -32,30 +28,27 @@ module.exports = async function handler(req, res) {
     
     console.log('✅ Match result:', matchResult);
     
-    res.status(200).json({
+    return NextResponse.json({
       success: true,
       data: matchResult
     });
   } catch (error) {
     console.error('❌ Match error:', error);
-    res.status(500).json({
+    return NextResponse.json({
       success: false,
       error: error.message || 'Product matching failed'
-    });
+    }, { status: 500 });
   }
-};
+}
 
-/**
- * 构建搜索查询
- */
 function buildSearchQuery(enterprise, classification) {
   const parts = [];
   
-  if (classification.推荐需求类型) {
+  if (classification?.推荐需求类型) {
     parts.push(classification.推荐需求类型.join(' '));
   }
   
-  if (classification.资产情况) {
+  if (classification?.资产情况) {
     parts.push(classification.资产情况);
   }
   

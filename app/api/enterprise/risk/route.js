@@ -1,18 +1,15 @@
 /**
  * 风控分析 API
  */
+import { NextResponse } from 'next/server';
 const { analyzeRisk } = require('../../../../lib/enterprise');
 
-module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+export async function POST(request) {
   try {
-    const { enterprise, classification } = req.body;
+    const { enterprise, classification } = await request.json();
     
     if (!enterprise) {
-      return res.status(400).json({ error: 'Enterprise data is required' });
+      return NextResponse.json({ error: 'Enterprise data is required' }, { status: 400 });
     }
 
     console.log('🔍 Analyzing risk for enterprise:', enterprise.name || 'Anonymous');
@@ -21,15 +18,15 @@ module.exports = async function handler(req, res) {
     
     console.log('✅ Risk analysis result:', riskAnalysis);
     
-    res.status(200).json({
+    return NextResponse.json({
       success: true,
       data: riskAnalysis
     });
   } catch (error) {
     console.error('❌ Risk analysis error:', error);
-    res.status(500).json({
+    return NextResponse.json({
       success: false,
       error: error.message || 'Risk analysis failed'
-    });
+    }, { status: 500 });
   }
-};
+}

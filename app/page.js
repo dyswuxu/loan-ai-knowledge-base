@@ -1,404 +1,181 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
-export default function Home() {
-  const [formData, setFormData] = useState({
+export default function Dashboard() {
+  const [quickForm, setQuickForm] = useState({
     name: '',
     industry: '',
-    scale: '小型',
     annualRevenue: '',
     yearsEstablished: '',
-    hasProperty: false,
-    annualTax: '',
-    bankFlow: '一般',
-    creditRating: '未知',
-    loanPurpose: ''
+    hasCollateral: false,
   });
-  
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setQuickForm(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleAnalyze = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
     setResult(null);
-
     try {
-      const response = await fetch('/api/enterprise/analyze', {
+      const res = await fetch('/api/enterprise/analyze', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ enterprise: formData })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enterprise: quickForm }),
       });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setResult(data.data);
-      } else {
-        setError(data.error || '分析失败');
-      }
+      const data = await res.json();
+      if (data.success) setResult(data.data);
     } catch (err) {
-      setError(err.message || '请求失败');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
+  const stats = [
+    { label: '客户总数', value: '0', icon: '👥', color: 'bg-blue-500' },
+    { label: '产品数量', value: '195', icon: '📦', color: 'bg-green-500' },
+    { label: '今日分析', value: '0', icon: '📊', color: 'bg-purple-500' },
+    { label: '待跟进潜客', value: '0', icon: '🎯', color: 'bg-orange-500' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            🏦 贷款AI知识库系统
-          </h1>
-          <p className="text-gray-600">
-            输入企业信息，获取智能贷款产品推荐和风控分析
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">工作台</h1>
+        <p className="text-gray-500 mt-1">欢迎使用贷款AI知识库系统</p>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Input Form */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              📋 企业信息录入
-            </h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    企业名称
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="（脱敏处理）"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    所在行业
-                  </label>
-                  <select
-                    name="industry"
-                    value={formData.industry}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">请选择</option>
-                    <option value="制造业">制造业</option>
-                    <option value="服务业">服务业</option>
-                    <option value="贸易">贸易</option>
-                    <option value="科技">科技</option>
-                    <option value="建筑">建筑</option>
-                    <option value="农业">农业</option>
-                    <option value="其他">其他</option>
-                  </select>
-                </div>
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-4">
+        {stats.map((s) => (
+          <div key={s.label} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-4">
+              <div className={`${s.color} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}>
+                {s.icon}
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    企业规模
-                  </label>
-                  <select
-                    name="scale"
-                    value={formData.scale}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="小微">小微</option>
-                    <option value="小型">小型</option>
-                    <option value="中型">中型</option>
-                    <option value="大型">大型</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    年营业额（万元）
-                  </label>
-                  <input
-                    type="number"
-                    name="annualRevenue"
-                    value={formData.annualRevenue}
-                    onChange={handleChange}
-                    placeholder="如：500"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    成立年限（年）
-                  </label>
-                  <input
-                    type="number"
-                    name="yearsEstablished"
-                    value={formData.yearsEstablished}
-                    onChange={handleChange}
-                    placeholder="如：3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    年纳税额（万元）
-                  </label>
-                  <input
-                    type="number"
-                    name="annualTax"
-                    value={formData.annualTax}
-                    onChange={handleChange}
-                    placeholder="如：20"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    银行流水情况
-                  </label>
-                  <select
-                    name="bankFlow"
-                    value={formData.bankFlow}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="优质">优质</option>
-                    <option value="良好">良好</option>
-                    <option value="一般">一般</option>
-                    <option value="较差">较差</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    企业信用评级
-                  </label>
-                  <select
-                    name="creditRating"
-                    value={formData.creditRating}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="未知">未知</option>
-                    <option value="AAA">AAA</option>
-                    <option value="AA">AA</option>
-                    <option value="A">A</option>
-                    <option value="BBB">BBB</option>
-                    <option value="其他">其他</option>
-                  </select>
-                </div>
-              </div>
-
               <div>
-                <label className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    name="hasProperty"
-                    checked={formData.hasProperty}
-                    onChange={handleChange}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    是否有房产抵押
-                  </span>
-                </label>
+                <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+                <p className="text-sm text-gray-500">{s.label}</p>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  贷款用途
-                </label>
-                <textarea
-                  name="loanPurpose"
-                  value={formData.loanPurpose}
-                  onChange={handleChange}
-                  rows={2}
-                  placeholder="如：扩大经营规模、采购设备"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-3 px-4 rounded-md text-white font-medium transition-colors ${
-                  loading 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                }`}
-              >
-                {loading ? '分析中...' : '🔍 开始分析'}
-              </button>
-            </form>
+            </div>
           </div>
+        ))}
+      </div>
 
-          {/* Results */}
-          <div className="space-y-6">
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <p className="text-red-800">❌ {error}</p>
+      {/* Quick Actions */}
+      <div className="grid grid-cols-3 gap-4">
+        <Link href="/customers/new" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+          <div className="text-3xl mb-3">➕</div>
+          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">新建客户档案</h3>
+          <p className="text-sm text-gray-500 mt-1">录入企业信息，开始分析</p>
+        </Link>
+
+        <Link href="/products" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+          <div className="text-3xl mb-3">📦</div>
+          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">浏览产品库</h3>
+          <p className="text-sm text-gray-500 mt-1">查看195个银行贷款产品</p>
+        </Link>
+
+        <Link href="/chat" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+          <div className="text-3xl mb-3">💬</div>
+          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">AI 对话</h3>
+          <p className="text-sm text-gray-500 mt-1">自然语言查询产品和客户</p>
+        </Link>
+      </div>
+
+      {/* Quick Analyze Form */}
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">⚡ 快速分析</h2>
+        <form onSubmit={handleAnalyze} className="space-y-4">
+          <div className="grid grid-cols-5 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">企业名称</label>
+              <input name="name" value={quickForm.name} onChange={handleChange} placeholder="（脱敏）" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">行业</label>
+              <select name="industry" value={quickForm.industry} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">请选择</option>
+                <option value="制造业">制造业</option>
+                <option value="商贸">商贸</option>
+                <option value="科技">科技</option>
+                <option value="服务业">服务业</option>
+                <option value="建筑">建筑</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">年营业额(万)</label>
+              <input name="annualRevenue" type="number" value={quickForm.annualRevenue} onChange={handleChange} placeholder="500" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">成立年限</label>
+              <input name="yearsEstablished" type="number" value={quickForm.yearsEstablished} onChange={handleChange} placeholder="3" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div className="flex items-end">
+              <label className="flex items-center gap-2 px-4 py-2">
+                <input name="hasCollateral" type="checkbox" checked={quickForm.hasCollateral} onChange={handleChange} className="w-4 h-4 rounded" />
+                <span className="text-sm">有抵押物</span>
+              </label>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button type="submit" disabled={loading} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+              {loading ? '分析中...' : '🔍 开始分析'}
+            </button>
+            <Link href="/customers/new" className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              完整建档 →
+            </Link>
+          </div>
+        </form>
+
+        {result && (
+          <div className="mt-6 p-4 bg-slate-50 rounded-lg">
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs text-gray-500">企业分类</p>
+                <p className="font-medium">{result.classification?.规模标签 || '-'}</p>
               </div>
-            )}
-
-            {loading && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                <div className="animate-spin text-4xl mb-4">⏳</div>
-                <p className="text-blue-800">正在分析企业信息...</p>
-              </div>
-            )}
-
-            {result && (
-              <>
-                {/* Enterprise Profile */}
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                    📊 企业画像
-                  </h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 rounded p-3">
-                      <div className="text-sm text-gray-500">规模标签</div>
-                      <div className="font-medium">{result.classification?.规模标签 || '-'}</div>
-                    </div>
-                    <div className="bg-gray-50 rounded p-3">
-                      <div className="text-sm text-gray-500">经营年限</div>
-                      <div className="font-medium">{result.classification?.经营年限标签 || '-'}</div>
-                    </div>
-                    <div className="bg-gray-50 rounded p-3">
-                      <div className="text-sm text-gray-500">财务表现</div>
-                      <div className="font-medium">{result.classification?.财务表现 || '-'}</div>
-                    </div>
-                    <div className="bg-gray-50 rounded p-3">
-                      <div className="text-sm text-gray-500">资产情况</div>
-                      <div className="font-medium">{result.classification?.资产情况 || '-'}</div>
-                    </div>
-                    <div className="bg-gray-50 rounded p-3">
-                      <div className="text-sm text-gray-500">纳税等级</div>
-                      <div className="font-medium">{result.classification?.纳税等级 || '-'}</div>
-                    </div>
-                    <div className="bg-gray-50 rounded p-3">
-                      <div className="text-sm text-gray-500">推荐需求</div>
-                      <div className="font-medium">{result.classification?.推荐需求类型?.join(', ') || '-'}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Risk Analysis */}
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                    ⚠️ 风控分析
-                  </h2>
-                  {result.risk_analysis && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600">风险评分</span>
-                        <span className={`font-bold text-lg ${
-                          result.risk_analysis.risk_level === '高' ? 'text-red-600' :
-                          result.risk_analysis.risk_level === '中' ? 'text-yellow-600' : 'text-green-600'
-                        }`}>
-                          {result.risk_analysis.risk_score} ({result.risk_analysis.risk_level})
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-600 mb-2">
-                        建议贷款额度：{result.risk_analysis.recommended_amount_range}
-                      </div>
-                      {result.risk_analysis.risk_factors?.length > 0 && (
-                        <div className="space-y-2">
-                          <div className="font-medium text-gray-700">风险因素：</div>
-                          {result.risk_analysis.risk_factors.map((factor, idx) => (
-                            <div key={idx} className="bg-gray-50 rounded p-3 text-sm">
-                              <span className={`font-medium ${
-                                factor.level === '高' ? 'text-red-600' :
-                                factor.level === '中' ? 'text-yellow-600' : 'text-green-600'
-                              }`}>
-                                [{factor.level}]
-                              </span>
-                              {' '}{factor.factor}
-                              {factor.suggestion && (
-                                <div className="text-gray-500 mt-1">→ {factor.suggestion}</div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Product Recommendations */}
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                    💡 推荐产品
-                  </h2>
-                  {result.product_recommendations?.recommended_products?.length > 0 ? (
-                    <div className="space-y-4">
-                      {result.product_recommendations.recommended_products.map((product, idx) => (
-                        <div key={idx} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <span className="font-medium text-gray-900">
-                                {product.bank} - {product.product_name}
-                              </span>
-                            </div>
-                            <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
-                              匹配度 {product.match_score}%
-                            </span>
-                          </div>
-                          {product.match_reasons?.length > 0 && (
-                            <div className="text-sm text-gray-600 mb-2">
-                              匹配理由：{product.match_reasons.join('；')}
-                            </div>
-                          )}
-                          {product.warnings?.length > 0 && (
-                            <div className="text-sm text-yellow-600">
-                              ⚠️ {product.warnings.join('；')}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-center py-4">暂未找到合适的推荐产品</p>
-                  )}
-                </div>
-              </>
-            )}
-
-            {!result && !loading && !error && (
-              <div className="bg-gray-100 rounded-lg p-8 text-center">
-                <p className="text-gray-500">
-                  👈 请在左侧填写企业信息，点击"开始分析"
+              <div>
+                <p className="text-xs text-gray-500">风险等级</p>
+                <p className={`font-medium ${
+                  result.risk_analysis?.risk_level === '高' ? 'text-red-600' :
+                  result.risk_analysis?.risk_level === '中' ? 'text-yellow-600' : 'text-green-600'
+                }`}>
+                  {result.risk_analysis?.risk_score || '-'} ({result.risk_analysis?.risk_level || '-'})
                 </p>
               </div>
+              <div>
+                <p className="text-xs text-gray-500">推荐产品</p>
+                <p className="font-medium">{result.product_recommendations?.recommended_products?.length || 0} 个</p>
+              </div>
+            </div>
+            {result.product_recommendations?.recommended_products?.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <p className="text-sm font-medium mb-2">推荐产品 TOP 3：</p>
+                <div className="space-y-2">
+                  {result.product_recommendations.recommended_products.slice(0, 3).map((p, i) => (
+                    <div key={i} className="flex items-center justify-between bg-white px-3 py-2 rounded">
+                      <span className="text-sm">{p.bank} - {p.product_name}</span>
+                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">匹配度 {p.match_score}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

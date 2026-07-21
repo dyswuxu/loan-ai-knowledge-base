@@ -14,7 +14,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 min-h-screen bg-slate-900 text-white flex flex-col">
+    <aside className="w-64 min-h-screen bg-slate-950 text-white flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-slate-700">
         <h1 className="text-lg font-bold">🏦 贷款AI知识库</h1>

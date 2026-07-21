@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { chatCompletion } from '../../lib/minimax';
+import { chatCompletion } from '../../../lib/minimax';
 
 /**
  * AI 对话 API - 真实接入 MiniMax 大模型
